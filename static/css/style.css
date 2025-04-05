@@ -1,0 +1,96 @@
+/* Additional custom styling */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    margin-top: auto;
+}
+
+pre {
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    overflow-x: auto;
+}
+
+code {
+    color: var(--bs-light);
+}
+
+.card {
+    border-color: var(--bs-gray-700);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: var(--bs-gray-800);
+    border-bottom: 2px solid var(--bs-primary);
+}
+
+audio {
+    width: 100%;
+    margin-top: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.btn-success {
+    margin-right: 0.5rem;
+}
+
+/* Recording button styles */
+#startEnrollRecording, #startVerifyRecording {
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+#startEnrollRecording:before, #startVerifyRecording:before {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    background-color: #ff4136;
+    border-radius: 50%;
+}
+
+/* Make the recording status stand out */
+#enrollRecordingStatus, #verifyRecordingStatus {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+/* Highlight active form */
+#enrollForm:focus-within, #verifyForm:focus-within {
+    animation: pulse 2s;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--bs-primary-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0);
+    }
+}
+
+/* Results table styling */
+.table-sm th, .table-sm td {
+    padding: 0.5rem;
+}

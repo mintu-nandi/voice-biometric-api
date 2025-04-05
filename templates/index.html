@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Biometric API</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container my-5">
+        <header class="mb-5">
+            <h1 class="display-4">Voice Biometric API</h1>
+            <p class="lead">A Python Flask API for voice biometrics that extracts and compares voice spectral features</p>
+            <hr class="my-4">
+        </header>
+
+        <section class="mb-5">
+            <h2>Overview</h2>
+            <p>This API provides voice biometric functionality using spectral analysis to extract voice features from WAV and OPUS audio files. It offers endpoints for enrolling users and verifying their voice against previously stored voice profiles.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>API Endpoints</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">POST /enroll</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Description</h4>
+                    <p>Enrolls a user by extracting and storing voice embeddings from an audio sample.</p>
+                    
+                    <h4>Request</h4>
+                    <p>Content-Type: multipart/form-data</p>
+                    <ul>
+                        <li><strong>user_id</strong> (required): A unique identifier for the user</li>
+                        <li><strong>audio</strong> (required): A WAV file containing the user's voice</li>
+                    </ul>
+                    
+                    <h4>Response</h4>
+                    <pre><code>{
+    "success": true,
+    "message": "Voice profile enrolled successfully"
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">POST /verify</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Description</h4>
+                    <p>Verifies a user by comparing a new voice sample with their stored voice embedding.</p>
+                    
+                    <h4>Request</h4>
+                    <p>Content-Type: multipart/form-data</p>
+                    <ul>
+                        <li><strong>user_id</strong> (required): The unique identifier for the user to verify</li>
+                        <li><strong>audio</strong> (required): A WAV or OPUS file containing the voice to verify</li>
+                    </ul>
+                    
+                    <h4>Response</h4>
+                    <pre><code>{
+    "success": true,
+    "match": true,
+    "similarity": 0.85,
+    "similarity_percentage": 85.00,
+    "threshold": 0.60,
+    "threshold_percentage": 60.00,
+    "user_id": "user123",
+    "interpretation": "Very likely same speaker",
+    "details": {
+        "enrolled_at": "2025-04-05T13:45:21.123456",
+        "threshold_description": {
+            "0.0 - 0.2": "Definitely different speakers",
+            "0.2 - 0.4": "Very likely different speakers",
+            "0.4 - 0.6": "Possibly different speakers",
+            "0.6 - 0.8": "Likely same speaker",
+            "0.8 - 1.0": "Very likely same speaker"
+        }
+    }
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">GET /audio/:user_id</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Description</h4>
+                    <p>Retrieves the stored audio file for a user.</p>
+                    
+                    <h4>Request</h4>
+                    <p>URL Parameter:</p>
+                    <ul>
+                        <li><strong>user_id</strong> (required): The unique identifier for the user</li>
+                    </ul>
+                    
+                    <h4>Response</h4>
+                    <p>Returns the audio file with appropriate Content-Type header (audio/wav or audio/ogg).</p>
+                    <p>In case of error, returns a JSON response:</p>
+                    <pre><code>{
+    "success": false,
+    "error": "Audio not found for this user"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <h2>Error Responses</h2>
+            <p>All error responses will follow this format:</p>
+            <pre><code>{
+    "success": false,
+    "error": "Error message describing what went wrong"
+}</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Try It Out</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>Enroll a User</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="enrollForm">
+                                <div class="mb-3">
+                                    <label for="enrollUserId" class="form-label">User ID</label>
+                                <button type="button" id="startEnrollRecording" class="btn btn-success mb-3">Record from Microphone</button>
+                                <div id="enrollRecordingStatus" class="mb-3"></div>
+                                    <input type="text" class="form-control" id="enrollUserId" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="enrollAudio" class="form-label">Voice Sample (WAV or OPUS)</label>
+                                    <input type="file" class="form-control" id="enrollAudio" accept=".wav, .opus" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Enroll</button>
+                            </form>
+                            <div id="enrollResult" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Verify a User</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="verifyForm">
+                                <button type="button" id="startVerifyRecording" class="btn btn-success mb-3">Record from Microphone</button>
+                                <div id="verifyRecordingStatus" class="mb-3"></div>
+                                <div class="mb-3">
+                                    <label for="verifyUserId" class="form-label">User ID</label>
+                                    <input type="text" class="form-control" id="verifyUserId" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="verifyAudio" class="form-label">Voice Sample (WAV or OPUS)</label>
+                                    <input type="file" class="form-control" id="verifyAudio" accept=".wav, .opus" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Verify</button>
+                            </form>
+                            <div id="verifyResult" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
