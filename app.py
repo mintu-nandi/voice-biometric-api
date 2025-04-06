@@ -47,3 +47,6 @@ with app.app_context():
     def root():
         from flask import redirect
         return redirect('/api/')
+@app.route('/')
+def index():
+    return render_template('index.html')

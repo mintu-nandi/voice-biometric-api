@@ -4,7 +4,6 @@ import datetime
 import sys
 from flask import Blueprint, request, jsonify, current_app, render_template
 from werkzeug.exceptions import BadRequest, NotFound
-from models import VoiceEmbedding
 from utils import save_audio_file, extract_embedding, calculate_similarity
 from app import db
 
@@ -56,6 +55,7 @@ def enroll():
             return jsonify({'success': False, 'error': 'Failed to extract voice embedding'}), 400
         
         # Read the audio file data for secure storage
+        from models import VoiceEmbedding
         with open(audio_path, "rb") as audio_file:
             audio_data = audio_file.read()
         
@@ -121,6 +121,7 @@ def verify():
         user_id = request.form['user_id']
         audio_file = request.files['audio']
         
+        from models import VoiceEmbedding
         # Check if user's enrollment voice exists - always compare with enrollment voice
         enrolled_voice = VoiceEmbedding.query.filter_by(user_id=user_id, is_enrollment=True).first()
         if not enrolled_voice:
@@ -251,6 +252,7 @@ def get_audio(user_id):
     - Audio file if found
     """
     try:
+        from models import VoiceEmbedding
         # Check if user's enrollment audio exists
         enrolled_voice = VoiceEmbedding.query.filter_by(user_id=user_id, is_enrollment=True).first()
         if not enrolled_voice or not enrolled_voice.audio_data:
